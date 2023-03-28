@@ -17,7 +17,7 @@ FONT_AWESOME = "https://use.fontawesome.com/releases/v5.10.2/css/all.css"
 external_stylesheets = [dbc.themes.BOOTSTRAP, dbc.themes.BOOTSTRAP, FONT_AWESOME]
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets,
 meta_tags=[{"name": "viewport", "content": "width=device-width, initial-scale=1"}])
-app.title = "Emotion Analytics Dashboard"
+app.title = "ESP Analytics Dashboard"
 
 app.layout = layout
 

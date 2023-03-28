@@ -3,6 +3,11 @@ import dash_html_components as html
 import dash_bootstrap_components as dbc
 import colorlover
 
+min_date = '2019-01-01'
+max_date = '2020-01-01'
+start_date = '2019-01-01'
+end_date = '2019-01-01'
+
 header = dbc.Jumbotron(
     [
         html.H1("Emotion Analytics Dashboard", className="display-3"),

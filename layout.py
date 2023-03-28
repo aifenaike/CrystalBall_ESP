@@ -47,33 +47,21 @@ SIDEBAR_STYLE = {
 sidebar
 """
 
-section_card = html.Div(
+Pump_type_card = html.Div(
     [
         dbc.FormGroup(
-            [   dbc.Label(html.H6("Enter the Number of Sections the data you intend to Analyze has (Standard vs What's New included)",className="mt-2"),size='md'),
+            [   dbc.Label(html.H6("Enter the Number of Pumps the data you intend to Analyze has (Standard vs What's New included)",className="mt-2"),size='md'),
                 dbc.Input(id='value_input',value=10,type='number',min=1,max=15),
-                dbc.Label(html.H4("Section",className="mt-2")
+                dbc.Label(html.H4("Pump Type",className="mt-2")
                 ),
                 #Adding Dropdown for selecting Sections.
                 
                 dcc.Dropdown(id ='sec_id',
                 options=[
-                    {'label': 'Composite', 'value': '0'},
-                    {'label': 'Advertisement', 'value': '1'},
-                    {'label': 'Billboards', 'value': '2'},
-                    {'label': 'Social Media', 'value': '3'},
-                    {'label': 'Product', 'value': '4'},
-                    {'label': 'In Store Display', 'value': '5'},
-                    {'label':'Section 6', 'value':6},
-                    {'label':'Section 7','value':7},
-                    {'label':'Section 8','value':8},
-                    {'label':'Section 9','value':9},
-                    {'label':'Section 10','value':10},
-                    {'label':'Section 11','value':11},
-                    {'label':'Section 12','value':12},
-                    {'label':'Section 13','value':13},
-                    {'label':'Section 14','value':14},
-                    {'label':'Section 15','value':15}
+                    {'label': 'Pump 859', 'value': '0'},
+                    {'label': 'Pump 851', 'value': '1'},
+                    {'label': 'Pump 451', 'value': '2'},
+                    {'label': 'Pump 680', 'value': '3'},
                 ], searchable = False, style={'textAlign': 'center','color':'Navy'}, value = '0')
             ]
         ),
@@ -83,52 +71,22 @@ section_card = html.Div(
 )
 
 
-Demographic_card = html.Div(
+Date_picker_card = html.Div(
     [
         dbc.FormGroup(
             [
-                dbc.Label(html.H4('Demographic', className="mt-2")),
-                #Adding Dropdown for selecting Demographics.
-            dcc.Dropdown(id = 'demo_id',
-            options=[
-                {'label': name, 'value': name } for name in names],
-                value = list(all_options.keys())[0],searchable = False,
-                style={'textAlign': 'center','color':'Navy'}
-                ),
-            ],
-            style={"minWidth": 100},
-        )
-    ],
-    className="px-2 mb-2",
-)
-
-Level_card = html.Div(
-    [
-        dbc.FormGroup(
-            [
-                dbc.Label(html.H4('Level', className="mt-2")),
-                #Adding Dropdown for selecting Level.
-                dcc.Dropdown(id = 'level_id',searchable = False,
-                style={'textAlign': 'center','color':'Navy'})
-            ])
-    ],
-    className="px-2 mb-2",
-)
-
-
-Data_card = html.Div(
-    [
-        dbc.FormGroup(
-            [
-                dbc.Label(html.H4('Data Options', className="mt-2")),
+                dbc.Label(html.H4('Date Picker', className="mt-2")),
         
-                dcc.RadioItems(id = 'graphing_id',
-                options=[
-                    {'label': 'Emoji Data-Graph', 'value': 1},
-                    {'label': 'Feelings Data-Graph', 'value': 2}
-                ],
-                labelStyle={'display':'block','color':'Navy'},
-                value= 1)  
+                dcc.DatePickerRange(
+                    id='date_picker',
+                    min_date_allowed=utils.min_date,
+                    max_date_allowed=utils.max_date,
+                    initial_visible_month=utils.max_date,
+                    start_date=utils.min_date,
+                    end_date=utils.max_date,
+                    display_format='MMM Do, YY',
+                    style={'textAlign': 'center','color':'Navy'}
+                )
             ]
         ),
     ],
@@ -136,7 +94,7 @@ Data_card = html.Div(
     style={"minWidth": 200},
 )
 
-visualization_card = html.Div(
+Visualization_card = html.Div(
     [
         dbc.FormGroup(
             [
@@ -145,7 +103,7 @@ visualization_card = html.Div(
                 dcc.RadioItems(id = 'type_id',
                 options=[
                     {'label': 'Line Plots', 'value': 1},
-                    {'label': 'Bar Charts', 'value': 2}
+                    {'label': 'Scatter Plots', 'value': 2}
                         ],
                 labelStyle={'display':'block','color':'Navy'},
                 value= 1)  
@@ -163,11 +121,9 @@ sidebar = dbc.Card(
             html.H2("Parameters",className="bg-primary text-white p-2")),
         dbc.CardBody(
             [
-                section_card,
-                Demographic_card,
-                Level_card,
-                Data_card,
-                visualization_card,
+                Pump_type_card,
+                Date_picker_card,
+                Visualization_card,
             ],
         ),
     ],
@@ -329,7 +285,7 @@ app_tabs = html.Div(
 
 layout_app = dbc.Card(
     [
-        html.H2("Emotion Analytics Dash App", className="bg-primary text-white p-2"),
+        html.H2("ESP Analytics Dash App", className="bg-primary text-white p-2"),
         dbc.Row(dbc.Col(app_tabs, className="mx-4")),
         layout_app_controls,
     ], style={'height':'100vh'},
