@@ -10,12 +10,12 @@ end_date = '2019-01-01'
 
 header = dbc.Jumbotron(
     [
-        html.H1("Emotion Analytics Dashboard", className="display-3"),
+        html.H1("ESP Analytics Dashboard", className="display-3"),
         html.P(
-            "Emoji are closely related to emotions. Using pre-built lists, \
-                the emojis used in this analysis have been grouped by human emotions (happy, unreceptive, annoyance\
-                 , admiration, satisfaction, and surprise, e.t.c) and are intended to scale our understanding of audience reaction on a particular theme.\
-                Here we follow emotion analysis based on a sample of two brands.",
+            " To elevate the accuracy of ESP fault recognition, \
+                we leveraged probabilistic prediction instead of direct label classification.\
+                In probabilistic prediction, we seek to predict the probability of a failure occurring rather than the exact status. \
+                    This approach helped reduce the ratio of false-positive alarms.",
             className="lead",
         ),
         html.P("A comparison between two brands (A/B Testing). ", className=" font-italic"),
