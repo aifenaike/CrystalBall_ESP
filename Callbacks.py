@@ -12,7 +12,7 @@ from utils import *
 import dash
 
 path = os.path.abspath(os.path.dirname(__file__))
-
+data_ = pd.read_csv(os.path.join(APP_PATH, os.path.join("data", "composite_time.csv")))
 def register_callbacks(app):
     @app.callback(
     [Output("app-content", "children"), Output("interval-component", "n_intervals")],
@@ -357,3 +357,33 @@ def register_callbacks(app):
             },
         }
         return new_figure
+    
+
+    @app.callback(
+    Output('result_graph_id', 'figure'),
+    [Input('analyze-submit-button', 'n_clicks')],
+    [State('result_graph_id', 'figure')]
+    )
+    def update_graph(n_clicks, figure):
+        if n_clicks == 0:
+            return dash.no_update
+        if n_clicks > 0:
+        # Replace this with your own animation plot
+            fig = plot_probabilities(data_)
+            return fig
+        
+
+    @app.callback(
+    Output('frame_data', 'srcDoc'),
+    [Input('analyze-submit-button', 'n_clicks')],
+    [State('frame_data', 'srcDoc')]
+    )
+    def update_frame(n_clicks, figure):
+        j=50
+        if n_clicks == 0:
+            return dash.no_update
+        if n_clicks > 0:
+            while j<70:
+                j+=1
+            # Replae this with your own animation plot
+                return plot_explanation(data_.iloc[j]).as_html()

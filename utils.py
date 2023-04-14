@@ -1,6 +1,6 @@
 import os
 import pathlib
-
+import plotly.express as px
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
@@ -10,11 +10,16 @@ import plotly.graph_objs as go
 import dash_daq as daq
 import dash_bootstrap_components as dbc
 import pandas as pd
+import lime
+import lime.lime_tabular
+import dill
+import numpy as np
+import pickle
+
 path = os.path.abspath(os.path.dirname(__file__))
 
 APP_PATH = str(pathlib.Path(__file__).parent.resolve())
 df = pd.read_csv(os.path.join(APP_PATH, os.path.join("data", "composite.csv")))
-
 
 params = list(df)
 max_length = len(df)
@@ -47,6 +52,40 @@ app_upload = html.Div([
                         'textAlign': 'center'},id = 'upload_difference_table'),
                 ])
 
+
+#load model
+pickled_model = pickle.load(open('model.pkl', 'rb'))
+with open('lime_explainer', 'rb') as f:
+    lime_explainer = dill.load(f)
+
+# LIME has one explainer for all the models
+# Choose the xth instance and use it to predict the results as loop
+def plot_explanation(data):
+    data = data[[ 'CURRENT', 'PRES_DISCHARGE', 'FREQUENCY', 'PRES_INTAKE', 'TEMP_INTAKE', 'TEMP_MOTOR_PUMP', 'VIBRATION']]
+    exp = lime_explainer.explain_instance(data, pickled_model.predict_proba, num_features=7) #if GOR and wcut is included increase the value of num_features
+    # Show the predictions
+    # exp.show_in_notebook(show_table=True)
+    return exp
+
+def plot_probabilities(data):
+    pickled_model = pickle.load(open('model.pkl', 'rb'))
+    data = data.dropna()
+    data['Date'] = pd.to_datetime(data['Date'])
+    data['week']=data['Date'].dt.week.astype(np.int64)
+    # read in your data
+    data=data.iloc[:100]
+    feature = data[[ 'CURRENT', 'PRES_DISCHARGE', 'FREQUENCY', 'PRES_INTAKE', 'TEMP_INTAKE', 'TEMP_MOTOR_PUMP', 'VIBRATION']]
+    predicted_probabilities = pickled_model.predict_proba(feature)[:,1]
+    # read in your data
+    data['failure_probabilities'] = predicted_probabilities
+    # create the animated line plot
+    fig = px.line(data, x='Date', y='failure_probabilities', animation_frame='week',range_x=[data["Date"].iloc[0], data["Date"].iloc[-1]], range_y=[0, 1])
+
+    # add labels and titles
+    fig.update_layout(title='Failure Forecast',
+                    xaxis_title='Date',  yaxis_title='failure_probabilities')
+    return fig
+
 def build_banner(app):
     return html.Div(
         id="banner",
@@ -63,14 +102,6 @@ def build_banner(app):
             html.Div(
                 id="banner-logo",
                 children=[
-                    html.A(
-                        html.Button(children="Dashboard"),
-                        href="https://plotly.com/get-demo/",
-                    ),
-                    html.A(
-                        html.Button(children="Prediction (ML)"),
-                        href="https://plotly.com/get-demo/",
-                    ),
                     html.Button(
                         id="learn-more-button", children="LEARN MORE", n_clicks=0
                     ),
@@ -238,29 +269,47 @@ def build_tab_upload():
                             html.Strong("Here you are required to upload a csv or excel file containing operational data such as discharge_pressure, intake_pressure, vibration, frequency, motor_temperature and current."),html.Br()],
                             style={"margin-left": "55px"})),
                 html.Br(),html.Br(),
+                    #Upload button
+                    html.Div(app_upload),
 
-                #Upload button
-                html.Div(app_upload),
-
-                # Adding Dropdown for selecting Sections.
-                html.Div(id='select_model_type',
-                    children= [
-                        html.Label(html.H6(html.Strong("Select a Model Architecture"), className="mt-2"),style={"margin-left": "55px"}),
-                        dcc.Dropdown(
-                        id="model_id",
-                        options=[
-                            {"label": "Long Short-Term Memory Networks (LSTM)", "value": "0"},
-                            {"label": "Gradient Boosting Machines", "value": "1"},
-                            {"label": "Anomaly detection", "value": "2"},
-                            ],
-                        searchable=False,
-                        style={ "color": "Navy", 'margin-top': '25px','height': '60px', 'align-items': 'center',
-                        'margin-bottom': '45px','margin-left': '27px','width': '50%',
-                         'borderRadius': '5px',"textAlign": "center",'justify-content': 'center'},
-                        #value="0",
-                        )]
-                    ),
-                dbc.Button("Analyze Data",id="analyze-submit-button", n_clicks=0,style={"margin-left": "195px",}),
+                    # Adding Dropdown for selecting Sections.
+                    html.Div(id='select_model_type',
+                        children= [
+                            html.Label(html.H6(html.Strong("Select a Model Architecture"), className="mt-2"),style={"margin-left": "55px"}),
+                            dcc.Dropdown(
+                            id="model_id",
+                            options=[
+                                {"label": "Long Short-Term Memory Networks (LSTM)", "value": "0"},
+                                ],
+                            searchable=False,
+                            style={ "color": "Navy", 'margin-top': '25px','height': '60px', 'align-items': 'center',
+                            'margin-bottom': '45px','margin-left': '27px','width': '50%',
+                            'borderRadius': '5px',"textAlign": "center",'justify-content': 'center'},
+                            #value="0",
+                            ),
+                            dbc.Button("Analyze Performance",id="analyze-submit-button", n_clicks=0,style={"margin-left": "195px",}),]
+                        ),
+                html.Div([
+                    html.Div([html.Br(),html.Br(),dcc.Graph(id='result_graph_id'),html.Br(),html.Br()], className='six columns'),
+                    html.Div([html.Br(),html.Br(),
+                              html.Iframe(id='frame_data',
+                                # Javascript is disabled from running in an Iframe for security reasons
+                                # Static HTML only!!!
+                                # srcDoc=plot_explanation().as_html(),
+                                width='100%',
+                                height='400px',
+                                style={'border': '2px #d3d3d3 solid','background-color':'#f0f0f0','font-size':'30px'},
+                            )
+                              
+                              ], className='six columns'),html.Br(),html.Br()], className='row')
+            #     html.Iframe(
+            #     # Javascript is disabled from running in an Iframe for security reasons
+            #     # Static HTML only!!!
+            #     srcDoc=explanation.as_html(),
+            #     width='100%',
+            #     height='800px',
+            #     style={'border': '2px #d3d3d3 solid'},
+            # )
     ]
 
 ud_usl_input = daq.NumericInput(
