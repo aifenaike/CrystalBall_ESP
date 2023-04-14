@@ -126,7 +126,6 @@ def init_df():
     for col in list(df[1:]):
         data = df[col]
         stats = data.describe()
-
         std = stats["std"].tolist()
         ucl = (stats["mean"] + 3 * stats["std"]).tolist()
         lcl = (stats["mean"] - 3 * stats["std"]).tolist()

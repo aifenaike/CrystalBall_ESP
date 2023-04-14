@@ -230,7 +230,7 @@ def register_callbacks(app):
                     {"selector": "table", "rule": "--accent: #1e2130;"},
                     {"selector": "tr", "rule": "background-color: transparent"},
                 ],
-                data=new_df.to_dict("rows"),
+                data=new_df.to_dict("records"),
                 columns=[{"id": c, "name": c} for c in ["Specs", "Current Setup"]],
             )
 
