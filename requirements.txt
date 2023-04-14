@@ -3,7 +3,6 @@ asttokens==2.2.1
 attrs==22.2.0
 backcall==0.2.0
 Brotli==1.0.9
-catboost==1.1.1
 certifi==2022.12.7
 charset-normalizer==3.1.0
 chart-studio==1.1.0
