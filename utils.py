@@ -71,7 +71,7 @@ def plot_probabilities(data):
     pickled_model = pickle.load(open('model.pkl', 'rb'))
     data = data.dropna()
     data['Date'] = pd.to_datetime(data['Date'])
-    data['week']=data['Date'].dt.week.astype(np.int64)
+    data['week']=data['Date'].dt.isocalendar().week.astype(np.int64)
     # read in your data
     data=data.iloc[:100]
     feature = data[[ 'CURRENT', 'PRES_DISCHARGE', 'FREQUENCY', 'PRES_INTAKE', 'TEMP_INTAKE', 'TEMP_MOTOR_PUMP', 'VIBRATION']]
@@ -363,13 +363,17 @@ def generate_modal():
                                 """
                         ###### What is this project about?
 
-                        This is a predictive analytics platform for monitoring real-time perfromance of ESP fleets along production nodes.
+                        This is a predictive analytics platform for monitoring performance of electrical submersible pumps along production nodes.
 
                         ###### What does this app shows
 
-                        Click on buttons in `Parameter` column to visualize details of measurement trendlines on the bottom panel.
+                        This app displays a stewhart monitoring model. A Shewhart process monitor helps distinguish between common cause variation (inherent to the process) and special cause variation (caused by external factors or unusual events). By providing a visual representation of the process performance over time, enabling process operators make data-driven decisions, identify process improvement opportunities, and ensure consistent quality output.
+                        
+                        The purpose of this equipment monitor is to detect any variations or changes in the operations of an ESP, which may indicate that it is out of control or not performing as expected.
+                        
+                        Thus helping to identify if the equipment is stable or exhibiting unusual behavior that requires investigation or corrective action.
 
-                        The sparkline on top panel and control chart on bottom panel show a Shewhart process monitor using user uploaded data.
+                        To achieve this data is plotted on a control chart. The control chart has a horizontal axis representing time (or the order of data collection) and a vertical axis representing the measured values. This chart also has a centerline that represents the average or target value of the process.
                         The trend is updated every other second to simulate real-time measurements. Data falling outside of six-sigma control limit are signals indicating 'Out of Control(OOC)', and will
                         trigger alerts instantly for a detailed checkup.
                         
@@ -948,6 +952,4 @@ def update_count(interval, col, data):
             color = "#FF0000"
 
     return str(total_count + 1), ooc_percentage_str, ooc_grad_val, color
-
-
 
